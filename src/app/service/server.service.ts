@@ -15,59 +15,61 @@ export class ServerService {
   constructor(private http: HttpClient) { }
 
   servers$ = <Observable<CustomResponse>>
-  this.http.get<CustomResponse>(`${this.apiUrl}/server`)
-  .pipe(
-    tap(console.log),
-    catchError(this.handleError)
-  );
+    this.http.get<CustomResponse>(`${this.apiUrl}/server`)
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      );
 
   save$ = (server: Server) => <Observable<CustomResponse>>
-  this.http.post<CustomResponse>(`${this.apiUrl}/server`, server)
-  .pipe(
-    tap(console.log),
-    catchError(this.handleError)
-  );
+    this.http.post<CustomResponse>(`${this.apiUrl}/server`, server)
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      );
 
   ping$ = (ipAddress: string) => <Observable<CustomResponse>>
-  this.http.get<CustomResponse>(`${this.apiUrl}/server/ping/${ipAddress}`)
-  .pipe(
-    tap(console.log),
-    catchError(this.handleError)
-  );
+    this.http.get<CustomResponse>(`${this.apiUrl}/server/ping/${ipAddress}`)
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      );
 
   filter$ = (status: Status, response: CustomResponse) => <Observable<CustomResponse>>
-  new Observable<CustomResponse>(
-    subscriber => {
-      console.log(response);
-      subscriber.next(
-        status === Status.ALL ? { ...response, message: `Servers filtered by ${status} status` } :
-        {
-          ...response,
-          message: response.data.servers
-          .filter(server => server.status).length > 0 ? `Servers filtered by
+    new Observable<CustomResponse>(
+      subscriber => {
+        console.log(response);
+        subscriber.next(
+          status === Status.ALL ? { ...response, message: `Servers filtered by ${status} status` } :
+            {
+              ...response,
+              message: response.data.servers
+                .filter(server => server.status).length > 0 ? `Servers filtered by
           ${status === Status.SERVER_UP ? 'SERVER UP'
-          : 'SERVER DOWN'} status` : `No servers of ${status} found`,
-          data: { servers: response.data.servers
-            ?.filter(server => server.status === status) }
-        }
+                : 'SERVER DOWN'} status` : `No servers of ${status} found`,
+              data: {
+                servers: response.data.servers
+                  ?.filter(server => server.status === status)
+              }
+            }
+        );
+        subscriber.complete();
+      }
+    )
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
       );
-      subscriber.complete();
-    }
-  )
-  .pipe(
-    tap(console.log),
-    catchError(this.handleError)
-  );
 
   delete$ = (serverId: number) => <Observable<CustomResponse>>
-  this.http.delete<CustomResponse>(`${this.apiUrl}/server/${serverId}`)
-  .pipe(
-    tap(console.log),
-    catchError(this.handleError)
-  );
+    this.http.delete<CustomResponse>(`${this.apiUrl}/server/${serverId}`)
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      );
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.log(error);
-    return throwError(() => { new Error(`An error ocurred - Error code: ${ error.status }`) });
+    return throwError(() => { new Error(`An error ocurred - Error code: ${error.status}`) });
   }
 }
