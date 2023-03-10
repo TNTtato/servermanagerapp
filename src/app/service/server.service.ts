@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { CustomResponse } from '../interface/custom-response';
@@ -34,7 +34,15 @@ export class ServerService {
     catchError(this.handleError)
   );
 
-  handleError(handleError: any): Observable<never> {
-    return throwError(() => { new Error('Not Implemented') });
+  delete$ = (serverId: number) => <Observable<CustomResponse>>
+  this.http.delete<CustomResponse>(`${this.apiUrl}/server/${serverId}`)
+  .pipe(
+    tap(console.log),
+    catchError(this.handleError)
+  );
+
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    console.log(error);
+    return throwError(() => { new Error(`An error ocurred - Error code: ${ error.status }`) });
   }
 }
